@@ -1,0 +1,39 @@
+version: '3.4'
+
+networks:
+  dev:
+    driver: bridge
+
+services:
+  simpleapi:
+    image: kakashidota/simpleapi:1.4
+    depends_on:
+      - "app_db"
+    container_name: brocontainer
+    ports:
+      - "8080:80"
+    build:
+      context: /simpleapi
+      dockerfile: Dockerfile
+    environment:
+      - ConnectionStrings__DefaultConnection=User ID=postgres; Password=postgres; Server=app_db; Port=5432; Database=Producttable;
+    networks:
+      - dev
+
+  app_db:
+    image: postgres:latest
+    container_name: app_db
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=Producttable
+    ports:
+      - "5433:5432"
+    restart: always
+    volumes:
+      - app_data:/var/lib/postgresql/data
+    networks:
+      - dev 
+
+volumes:
+  app_data:
